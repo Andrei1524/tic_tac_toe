@@ -1,3 +1,72 @@
+function getDefaultData() {
+    return {
+        playing_as: {
+            player1: false,
+            player2: false,
+            robot: false
+        },
+        winner: "",
+        choosingPlayersScreen: true,
+        choosingX_or_OScreen: false,
+        players: {
+            player1_playing_with: "",
+            player2_playing_with: "",
+            robot_playing_with: ""
+        },
+        game_turn: {
+            player1: false,
+            player2: false,
+            robot: false
+        },
+        game: [
+            {
+                occupied_with: "",
+                occupied_by: "", // player 1, player 2 or robot
+                name: "B1"
+            },
+            {
+                occupied_with: "",
+                occupied_by: "", // player 1, player 2 or robot
+                name: "B2"
+            },
+            {
+                occupied_with: "",
+                occupied_by: "", // player 1, player 2 or robot
+                name: "B3"
+            },
+            {
+                occupied_with: "",
+                occupied_by: "", // player 1, player 2 or robot
+                name: "B4"
+            },
+            {
+                occupied_with: "",
+                occupied_by: "", // player 1, player 2 or robot
+                name: "B5"
+            },
+            {
+                occupied_with: "",
+                occupied_by: "", // player 1, player 2 or robot
+                name: "B6"
+            },
+            {
+                occupied_with: "",
+                occupied_by: "", // player 1, player 2 or robot
+                name: "B7"
+            },
+            {
+                occupied_with: "",
+                occupied_by: "", // player 1, player 2 or robot
+                name: "B8"
+            },
+            {
+                occupied_with: "",
+                occupied_by: "", // player 1, player 2 or robot
+                name: "B9"
+            }
+        ]
+    }
+}
 let app = new Vue({
     el: '#game',
     data: {
@@ -6,6 +75,7 @@ let app = new Vue({
             player2: false,
             robot: false
         },
+        winner: "",
         choosingPlayersScreen: true,
         choosingX_or_OScreen: false,
         players: {
@@ -67,6 +137,9 @@ let app = new Vue({
         ]
     },
     methods: {
+        newGame() {
+            this.$data = getDefaultData()
+        },
         // CHOOSING HOW MANY PLAYERS SCREEEN
         turnOffPlayersScreen() {
             //turning off choosing players screen
@@ -133,27 +206,30 @@ let app = new Vue({
         },
         // TURN
         turn(block) {
-            if (!block.occupied_by) { // if the block is empty
-                if (this.playing_as.player1 && this.playing_as.robot) {
-                    if (this.game_turn.player1) {
-                        this.fillBlock(block)
-                        this.game_turn.player1 = false
-                        this.game_turn.robot = true
-                        this.checkWinningCombos()
-                        return
-                    }
-    
-                    if (this.game_turn.robot) {
-                        this.fillBlock(block)
-                        this.game_turn.player1 = true
-                        this.game_turn.robot = false
-                        this.checkWinningCombos()
-                        return
+            if (!this.checkWinningCombos()) {
+                if (!block.occupied_by) { // if the block is empty
+                    if (this.playing_as.player1 && this.playing_as.robot) {
+                        if (this.game_turn.player1) {
+                            this.fillBlock(block)
+                            this.game_turn.player1 = false
+                            this.game_turn.robot = true
+                            this.checkWinningCombos()
+                            return
+                        }
+        
+                        if (this.game_turn.robot) {
+                            this.fillBlock(block)
+                            this.game_turn.player1 = true
+                            this.game_turn.robot = false
+                            this.checkWinningCombos()
+                            return
+                        }
                     }
                 }
             }
         },
         checkWinningCombos() {
+            let whoWon = ""
             let winningMatrice = [
                 ["B1","B2","B3"],
 
@@ -196,12 +272,25 @@ let app = new Vue({
                 }
             })
 
-            
-            // let firstCut = blocksOccupiedByPlayer1.splice(0, 3).sort()
-            // let secondCut = blocksOccupiedByPlayer1.splice(2).sort()
+            function checkWin(playerBlocks, playerName) {
+                winningMatrice.forEach(block => {
+                    // console.log(block)
+                    // thanks to lodash <3
+                    let found = _.intersection(block, playerBlocks)
+                    
+                    if (found.toString() === block.toString()) {
+                        whoWon = `${playerName} won`
+                    }
+                })
+            }
 
-            
-            
+            checkWin(blocksOccupiedByPlayer1, "Player 1")
+            checkWin(blocksOccupiedByRobot, "Robot")
+
+            if (whoWon) {
+                this.winner = whoWon
+                return whoWon
+            }
         }
     }
 })

@@ -27,14 +27,19 @@
         </div>
 
         <div class="game_screen" v-if="!choosingPlayersScreen && !choosingX_or_OScreen">
+            {{winner}}
             <div class="game_screen_turn">
                 <span v-if="playing_as.player1">Player1: 0</span> |
                 <span v-if="playing_as.player2">Player2: 0</span> 
                 <span v-if="playing_as.robot">robot: 0</span>
             </div>
 
-            <div class="game_interactivity">
+            <div class="game_interactivity" v-if="!winner">
                 <span v-for="block in game" v-on:click="turn(block)">{{ block.occupied_with }}</span>
+            </div>
+
+            <div v-if="winner">
+                <span v-on:click="newGame">New Game</span>
             </div>
         </div>
     </div>
